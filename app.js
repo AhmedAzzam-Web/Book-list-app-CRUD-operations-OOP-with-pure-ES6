@@ -160,6 +160,6 @@ list.addEventListener('click', (element) => {
         Ui.updateBook(element.target)
         Ui.removeBook(element.target)
         Store.removeBooks(element.target.parentElement.previousElementSibling.textContent);
-        Ui.showAlert('Book Updated', 'success');
+        Ui.showAlert('You can update book item now', 'success');
     }
 })
