@@ -3,82 +3,93 @@ let author = document.getElementById('author')
 let serial = document.getElementById('serial')
 
 let container = document.querySelector('.container')
-let bookForm = document.getElementById('book-form')
-let bookList = document.getElementById('book-list')
+let form = document.getElementById('book-form')
+let list = document.getElementById('book-list')
+let submit = document.querySelector('.submit')
 
-// create class book that create the book object
+// create book class that create the book object
 class Book {
-    constructor (title, author, serial) {
+    constructor(title, author, serial) {
         this.title = title;
         this.author = author;
-        this.serial = serial
+        this.serial = serial;
     }
 }
 
-// create the Ui class that handles all ui methods and operations
+// Create the Ui class that handels methods and operaions in user-side
 class Ui {
+    static displayBook() {
 
-    static displayBook () {
+        let books = Store.getBooks();
 
-        let books = Store.getBooks()
-
-        books.forEach( (book) => {
+        books.forEach((book) => {
             Ui.addBook(book)
         })
-
     }
 
-    static addBook (book) {
+    static addBook(book) {
         let row = document.createElement('tr')
 
         row.innerHTML = `
-            <td>${book.title}</td>
-            <td>${book.author}</td>
-            <td>${book.serial}</td>
-            <td> <a class='btn btn-danger btn-sm delete'>X</a> </td>
+            <td class='title'>${book.title}</td>
+            <td class='author'>${book.author}</td>
+            <td class='serial'>${book.serial}</td>
+            <td> <a class='delete btn btn-danger btn-sm'>X</a> </td>
+            <td> <a class='update btn-sm btn btn-primary'>update</a> </td>
         `
 
-        bookList.appendChild(row)
+        list.appendChild(row)
     }
 
-    static deleteBook (e) {
-        if (e.classList.contains('delete')) {
-            e.parentElement.parentElement.remove()
-        }
-    }
+    static showAlert(message, state) {
+        let box = document.createElement('div')
 
-    static showAlert(message , state) {
-        let div = document.createElement('div')
+        box.className = `alert alert-${state}`
 
-        div.className = `alert alert-${state}`
+        box.appendChild(document.createTextNode(message))
 
-        div.appendChild(document.createTextNode(message))
-
-        container.insertBefore(div , bookForm)
+        container.insertBefore(box, form)
 
         setTimeout(() => {
             document.querySelector('.alert').remove()
-        }, 2500)
+        }, 2500);
     }
 
-    static clearInputs () {
+    static clearInputs() {
         title.value = '';
         author.value = '';
         serial.value = '';
     }
 
+    static removeBook(e) {
+        if (e.classList.contains('delete') || e.classList.contains('update')) {
+            e.parentElement.parentElement.remove();
+        }
+    }
+
+    static updateBook(e) {
+        if (e.classList.contains('update')) {
+            let rowTitle = e.parentElement.parentElement.children[0].textContent
+            let rowAuthor = e.parentElement.parentElement.children[1].textContent
+            let rowSerial = e.parentElement.parentElement.children[2].textContent
+
+            title.value = rowTitle;
+            author.value = rowAuthor;
+            serial.value = rowSerial;
+            submit.value = 'Update Book';
+        }
+    }
 }
 
-// local storage class 
-class Store{
+// store class that handles local storage operaions
+class Store {
+    static getBooks() {
 
-    // get the books from local storage
-    static getBooks () {
-
+        // the variable that we will control local storage with and return local storage values in it
         let books;
 
-        // check if there are books in the local storage or not
-        if ( localStorage.getItem('books') === null ) {
+        // check if there is books in local storage or not
+        if (localStorage.getItem('books') === null) {
             books = [];
         }
         else {
@@ -86,66 +97,69 @@ class Store{
         }
 
         return books;
-
     }
 
     static addBooks(book) {
-        // add the book to local storage
-        let books = Store.getBooks();
+        // grep local storage books
+        let books = Store.getBooks()
 
         books.push(book)
 
-        // update the local storage with the new array
-        localStorage.setItem('books' , JSON.stringify(books))
+        localStorage.setItem('books', JSON.stringify(books))
     }
 
-    static removeBook (serial) {
-        let books = Store.getBooks();
+    static removeBooks(serial) {
+        let books = Store.getBooks()
 
-        books.forEach((book , index) => {
+        books.forEach((book, index) => {
             if (index === 0) {
                 localStorage.clear()
             }
             else {
                 if (book.serial === serial) {
-                    books.splice(index , 1)
+                    books.splice(index, 1)
+                    localStorage.setItem(JSON.stringify(books))
                 }
-                JSON.stringify( localStorage.setItem('books', books) )
             }
         })
-
     }
 }
 
-// event display Ui book
-document.addEventListener('DOMContentLoaded' , Ui.displayBook)
+// event display books
 
-// event add book with the submit button form
-bookForm.addEventListener('submit' , (e) => {
+document.addEventListener('DOMContentLoaded', Ui.displayBook())
+
+// event add books with the submit form button
+form.addEventListener('submit', (e) => {
     e.preventDefault()
 
     if (title.value == '' || author.value == '' || serial.value == '') {
-        Ui.showAlert('Please fill in all inputs' , 'danger')
+        Ui.showAlert('Please fill in all inputs', 'danger')
     }
     else {
         let book = new Book(title.value, author.value, serial.value)
 
-        Store.addBooks(book)
-    
         Ui.addBook(book)
-    
-        Ui.showAlert('item added successfully' , 'success')
-        
+
+        Ui.showAlert('book added successfully', 'success')
+
+        Store.addBooks(book)
+
         Ui.clearInputs()
     }
 })
 
-// event remove book
-bookList.addEventListener('click' , (e) => {
-    
-    Ui.deleteBook(e.target)
-
-    Store.removeBook(e.target.parentElement.previousElementSibling.textContent)
-
-    Ui.showAlert('item removed successfully' , 'success')
+// event remove a book
+list.addEventListener('click', (element) => {
+    if (element.target.classList.contains('delete')) {
+        Ui.removeBook(element.target)
+        Store.removeBooks(element.target.parentElement.previousElementSibling.textContent);
+        Ui.showAlert('Book Removed', 'success');
+    }
+    if (element.target.classList.contains('update')) {
+        Ui.updateBook(element.target)
+        Ui.removeBook(element.target)
+        Store.removeBooks(element.target.parentElement.previousElementSibling.textContent);
+        Ui.showAlert('Book Updated', 'success');
+    }
 })
