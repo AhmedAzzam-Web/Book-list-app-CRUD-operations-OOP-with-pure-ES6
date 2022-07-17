@@ -16,4 +16,6 @@ It is responsibe for local storage operations. get, create and delete functions
 ### Forth part is the for the form operations DOMContentLoaded, oninput, etc
 It is responsibe for applying all methods above which is create, read ,delete
 
-I saw the idea of the project on youtube and i created it
+### [Live app](https://book-list-cruds-oop.netlify.app/)
+
+### Live Link: https://book-list-cruds-oop.netlify.app/
