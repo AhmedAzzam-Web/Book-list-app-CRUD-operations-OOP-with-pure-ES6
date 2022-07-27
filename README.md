@@ -5,16 +5,16 @@ Book List App using pure ES6 Vanilla JavaScript and Local Storage and doing CRUD
 This project is seperated into four parts
 
 ### First part is the constructor class Book
-It creates as many objects as you want 
+It creates as many objects (Books) as you want.
 
 ### Second part is the Ui class
-It is responsibe for displaying data, it checks the local storage for data and displays it, It also responsible for (create and delete) functions
+It is responsible for displaying data in the screen does not do any functionality behind the screen, it checks the local storage for data and displays it.
 
 ### Third part is the Store class
-It is responsibe for local storage operations. get, create and delete functions
+It is responsible for local storage operations. (Create, Update, Delete) functions. This class does all the functionality
 
 ### Forth part is the for the form operations DOMContentLoaded, oninput, etc
-It is responsibe for applying all methods above which is create, read ,delete
+It is responsible for applying all methods above which is (create, read, update ,delete).
 
 ### [Live app](https://book-list-cruds-oop.netlify.app/)
 
